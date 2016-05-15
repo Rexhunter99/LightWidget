@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="lwDirect3D" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug-Win32">
+				<Option output="bin/BG_GameStudio-dbg" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-std=c++11" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-fno-omit-frame-pointer" />
+					<Add option="-O0" />
+					<Add option="-DBACKEND_W32" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="-pg" />
+					<Add option="-luser32" />
+					<Add option="-lgdi32" />
+					<Add option="-lkernel32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lcomdlg32" />
+					<Add option="-lopengl32" />
+				</Linker>
+			</Target>
+			<Target title="Release-Win32">
+				<Option output="bin/Release/wgm" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-march=corei7" />
+					<Add option="-O3" />
+					<Add option="-std=c++11" />
+					<Add option="-DBACKEND_W32" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-luser32" />
+					<Add option="-lgdi32" />
+					<Add option="-lkernel32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lcomdlg32" />
+				</Linker>
+			</Target>
+			<Target title="Debug-X11">
+				<Option output="bin/Debug/wgm" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-std=c++11" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-fno-omit-frame-pointer" />
+					<Add option="-O0" />
+					<Add option="-DBACKEND_X11" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg" />
+					<Add option="-pthread" />
+					<Add option="-lX11" />
+				</Linker>
+			</Target>
+			<Target title="Debug-GTK">
+				<Option output="bin/BG_GameStudio-gtk" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-std=c++11" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-fno-omit-frame-pointer" />
+					<Add option="-O0" />
+					<Add option="`pkg-config --cflags gtk+-3.0`" />
+					<Add option="-DBACKEND_GTK" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="`pkg-config --libs gtk+-3.0`" />
+				</Linker>
+			</Target>
+			<Target title="Debug-GL-Lib">
+				<Option output="lwOpenGLCanvas-dbg" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj/Debug/" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-std=c++11" />
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-fno-omit-frame-pointer" />
+					<Add option="-O0" />
+					<Add option="-DBACKEND_W32" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="-pg" />
+					<Add option="-luser32" />
+					<Add option="-lgdi32" />
+					<Add option="-lkernel32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lcomdlg32" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<DoxyBlocks>
+				<comment_style block="0" line="2" />
+				<doxyfile_project project_number="1" output_directory="docs" />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot class_diagrams="1" have_dot="1" />
+				<general use_at_in_tags="1" />
+			</DoxyBlocks>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

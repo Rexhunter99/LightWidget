@@ -1,0 +1,32 @@
+# depslib dependency file v1.0
+1463134578 source:c:\users\rexhu\onedrive\programming\lightwidget\lw-gl-wgl.cpp
+	<Windows.h>
+	<gl/gl.h>
+	"lw-gl.h"
+	<cstdio>
+
+1463111289 c:\users\rexhu\onedrive\programming\lightwidget\lw-gl.h
+	<lw-main.h>
+	<map>
+	<string>
+	<mutex>
+
+1428024001 c:\users\rexhu\onedrive\programming\lightwidget\lw-main.h
+	<stdint.h>
+	<string>
+	<vector>
+
+1463111262 source:c:\users\rexhu\onedrive\programming\lightwidget\test_glcanvas.cpp
+	"lw-main.h"
+	"lw-resources.h"
+	"lw-gl.h"
+	<cstdio>
+	<cstdlib>
+	<memory.h>
+	<chrono>
+	<thread>
+	<GL/gl.h>
+
+1425172367 c:\users\rexhu\onedrive\programming\lightwidget\lw-resources.h
+	"lw-main.h"
+
