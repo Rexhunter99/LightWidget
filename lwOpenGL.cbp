@@ -128,6 +128,9 @@
 		<Linker>
 			<Add directory="lib/" />
 		</Linker>
+		<Unit filename="lw-gl-glx.cpp">
+			<Option target="Debug-GLX" />
+		</Unit>
 		<Unit filename="lw-gl-wgl.cpp">
 			<Option target="Debug-GL-Lib" />
 			<Option target="Debug-WGL" />

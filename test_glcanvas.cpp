@@ -146,7 +146,11 @@ int main( int argc, char **argv )
 	g_window.center();
 
 	// -- Create the OpenGLCanvas
-	std::map<std::string,std::string> gl_options;
+	std::map<lwOpenGLCanvas::lwOpenGLCanvasAttributeEnum,int> gl_options;
+#define add_opt( a, b ) gl_options.insert( std::pair<lwOpenGLCanvas::lwOpenGLCanvasAttributeEnum,int>( a, b ))
+    add_opt( lwOpenGLCanvas::LWGL_PROFILE, lwOpenGLCanvas::LWGL_PROFILE_CORE );
+    add_opt( lwOpenGLCanvas::LWGL_API_MAJOR_VERSION, 3 );
+#undef add_opt
 	// TODO: Fill the options up for custom context creation.
 	g_glcanvas.create((lwBaseControl*)&g_window, gl_options);
 	g_glcanvas.maximise();

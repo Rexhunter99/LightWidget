@@ -9,14 +9,21 @@ lwOpenGLCanvas::lwOpenGLCanvas()
 {
 	this->gl_context = nullptr;
 	this->device_context = nullptr;
+	//this->m_type = lwWidgetTypeEnum::LW_VIDEO_CANVAS + 1;
 }
 
 lwOpenGLCanvas::~lwOpenGLCanvas()
 {
+    if ( this->m_mutex.try_lock() )
+    {
+        fprintf(stderr, "~lwOpenGLCanvas() :: Warning! Context was not unlocked!");
+    }
+
+    this->m_mutex.unlock();
 	this->destroy();
 }
 
-bool lwOpenGLCanvas::create( lwBaseControl* p_parent, std::map<std::string,std::string> &p_options )
+bool lwOpenGLCanvas::create( lwBaseControl* p_parent, std::map<lwOpenGLCanvasAttributeEnum,int> &p_options )
 {
 	if ( p_parent == nullptr || p_parent->m_handle == nullptr )
 	{
@@ -87,10 +94,7 @@ bool lwOpenGLCanvas::create( lwBaseControl* p_parent, std::map<std::string,std::
 
 	wglMakeCurrent( (HDC)this->device_context, (HGLRC)this->gl_context );
 
-	// -- Size the widget correctly
-
-
-
+	// TODO: Create a GL3+ Context here if requested
 
 	wglMakeCurrent( nullptr, nullptr );
 

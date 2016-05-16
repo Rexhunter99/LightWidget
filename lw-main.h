@@ -72,6 +72,9 @@ enum lwWidgetTypeEnum {
 	LW_TOOLTIP,
 	LW_TRACKBAR,
 	LW_TREEVIEW,
+
+	LW_VIDEO_CANVAS                 = 0xFF,
+	// -- Any 2D/3D Canvas' must use "LW_VIDEO_CANVAS + #" where # is a unique number that helps identify it
 	LW_LAST_WIDGET					= 0xFFFF,
 	// -- Any custom widgets must use "LW_LAST_WIDGET + #" Where # is a unique number that helps identify it
 	LW_DWORD						= 0xFFFFFFFF
@@ -96,11 +99,13 @@ public:
 	lwStringType	getTitle( ) const;
 	lwStringType	getVersion( ) const;
 	size_t		getWorkingDirectory( char* p_directory, size_t p_max_length );
+	size_t      getApplicationDirectory( char* p_directory, size_t p_max_length );
 	uint32_t	getScreenCount() const;
 	uint32_t	getScreenWidth() const;
 	uint32_t	getScreenHeight() const;
 
 	bool        messageLoop();
+	bool        messageLoop(void(*p_callback)(void));
 };
 
 

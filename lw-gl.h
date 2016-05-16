@@ -91,6 +91,9 @@ public:
 	 * Swap this canvas' back and front buffers, the drivers determine if the buffer is flipped or copied
      */
     bool swapBuffers();
+
+
+    void (*onContextReset)( void );
 };
 
 #endif // __LIGHTWIDGET_OPENGLCANVAS_H__
