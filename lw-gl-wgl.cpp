@@ -14,7 +14,7 @@ lwOpenGLCanvas::lwOpenGLCanvas()
 
 lwOpenGLCanvas::~lwOpenGLCanvas()
 {
-    if ( this->m_mutex.try_lock() )
+    if ( !this->m_mutex.try_lock() )
     {
         fprintf(stderr, "~lwOpenGLCanvas() :: Warning! Context was not unlocked!");
     }
@@ -23,17 +23,22 @@ lwOpenGLCanvas::~lwOpenGLCanvas()
 	this->destroy();
 }
 
-bool lwOpenGLCanvas::create( lwBaseControl* p_parent, std::map<lwOpenGLCanvasAttributeEnum,int> &p_options )
+bool lwOpenGLCanvas::create( lwBaseControl* p_parent, std::map<int,int> &p_options )
 {
 	if ( p_parent == nullptr || p_parent->m_handle == nullptr )
 	{
 		return false;
 	}
 
+    int r_colorbits = 32;
+    int r_depthbits = 24;
+    int r_stencilbits = 8;
+
 	uint32_t style = WS_VISIBLE;
 	uint32_t ex_style = 0;
-	if ( this->border     ) style = WS_BORDER;
-	if ( this->clientEdge ) style = WS_EX_CLIENTEDGE;
+
+	if ( this->border     ) style       |= WS_BORDER;
+	if ( this->clientEdge ) ex_style    |= WS_EX_CLIENTEDGE;
 
 	this->m_handle = CreateWindowEx(ex_style,
 									"Static",

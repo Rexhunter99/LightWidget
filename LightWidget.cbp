@@ -105,6 +105,9 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="README.md">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="lw-main-gtk.cpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
