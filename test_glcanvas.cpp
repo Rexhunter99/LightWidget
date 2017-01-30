@@ -82,32 +82,29 @@ void eventMainWindowResize( int32_t w, int32_t h )
 void threadOpenGLRender(void)
 {
     /// -- NOTE: Can do OpenGL/Direct3D rendering if using a GL/D3D control, or just general runtime processing
-OPENGLTHREAD_BEGIN:
-    g_glcanvas.setCurrent();
+	while ( !g_gl_thread_quit )
+	{
+		g_glcanvas.setCurrent();
 
-    glClearColor( 0.0f, 0.0f, 0.5f, 1.0f );
-	glClear( GL_COLOR_BUFFER_BIT );
-	glLoadIdentity();
+		glClearColor( 0.0f, 0.0f, 0.5f, 1.0f );
+		glClear( GL_COLOR_BUFFER_BIT );
+		glLoadIdentity();
 
-	chrono::steady_clock::time_point time_now = chrono::steady_clock::now();
-	chrono::duration<double> time_span = chrono::duration_cast<chrono::duration<double>>(time_now - time_application_start);
-	glRotatef( 360.0f * time_span.count(), 0.0f, 0.0f, 1.0f );
+		chrono::steady_clock::time_point time_now = chrono::steady_clock::now();
+		chrono::duration<double> time_span = chrono::duration_cast<chrono::duration<double>>(time_now - time_application_start);
+		glRotatef( 360.0f * time_span.count(), 0.0f, 0.0f, 1.0f );
 
-	glBegin( GL_TRIANGLES );
-		glColor3ub( 255, 0, 0 );	glVertex2f( 0.0f, 1.0f );
-		glColor3ub( 0, 255, 0 );	glVertex2f( 1.0f,-1.0f );
-		glColor3ub( 0, 0, 255 );	glVertex2f(-1.0f,-1.0f );
-	glEnd();
+		glBegin( GL_TRIANGLES );
+			glColor3ub( 255, 0, 0 );	glVertex2f( 0.0f, 1.0f );
+			glColor3ub( 0, 255, 0 );	glVertex2f( 1.0f,-1.0f );
+			glColor3ub( 0, 0, 255 );	glVertex2f(-1.0f,-1.0f );
+		glEnd();
 
-	g_glcanvas.swapBuffers();
+		g_glcanvas.swapBuffers();
 
-	g_glcanvas.unsetCurrent();
-	std::this_thread::sleep_for( chrono::milliseconds( 1 ) );
-
-	if ( g_gl_thread_quit == false )
-        goto OPENGLTHREAD_BEGIN;
-    else
-        return;
+		g_glcanvas.unsetCurrent();
+		std::this_thread::sleep_for( chrono::milliseconds( 1 ) );
+	}
 }
 
 

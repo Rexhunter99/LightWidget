@@ -16,14 +16,18 @@
 #endif // UNICODE || UTF16
 
 /// Define the TEXT macro to support wide and multichar string literals like WinAPI
-#if defined( UNICODE ) && !defined( TEXT )
+#if defined( UNICODE )
 	#undef __TEXT
 	#define __TEXT( s ) L##s
-	#define TEXT(s) __TEXT(s)
+	#if !defined(TEXT)
+	#	define TEXT(s) __TEXT(s)
+	#endif
 #else
 	#undef __TEXT
 	#define __TEXT( s ) s
-	#define TEXT(s) __TEXT(s)
+	#if !defined(TEXT)
+	#	define TEXT(s) __TEXT(s)
+	#endif
 #endif
 
 #ifndef lwNativeWindowType

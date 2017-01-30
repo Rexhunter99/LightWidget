@@ -4,6 +4,9 @@
 
 #include "lw-gl.h"
 #include <cstdio>
+#include <iostream>
+
+using namespace std;
 
 lwOpenGLCanvas::lwOpenGLCanvas()
 {
@@ -25,14 +28,43 @@ lwOpenGLCanvas::~lwOpenGLCanvas()
 
 bool lwOpenGLCanvas::create( lwBaseControl* p_parent, std::map<int,int> &p_options )
 {
+
 	if ( p_parent == nullptr || p_parent->m_handle == nullptr )
 	{
 		return false;
 	}
 
-    int r_colorbits = 32;
-    int r_depthbits = 24;
-    int r_stencilbits = 8;
+	int r_redbits = 8,
+		r_greenbits = 8,
+		r_bluebits = 8,
+		r_alphabits = 8,
+		r_depthbits = 16,
+		r_stencilbits = 0,
+		r_profile = 0,
+		r_gl_major_version = 1,
+		r_gl_minor_version = 0;
+
+	try { r_profile	= p_options.at(lwOpenGLCanvasAttributeEnum::LWGL_PROFILE); }
+	catch ( const out_of_range &oor ) {}
+	try { r_gl_major_version = p_options.at(lwOpenGLCanvasAttributeEnum::LWGL_API_MAJOR_VERSION); }
+	catch ( const out_of_range &oor ) {}
+	try { r_gl_minor_version = p_options.at(lwOpenGLCanvasAttributeEnum::LWGL_API_MINOR_VERSION); }
+	catch ( const out_of_range &oor ) {}
+	try { r_redbits	= p_options.at(lwOpenGLCanvasAttributeEnum::LWGL_RED_BITS); }
+	catch ( const out_of_range &oor ) {}
+	try { r_greenbits	= p_options.at(lwOpenGLCanvasAttributeEnum::LWGL_GREEN_BITS); }
+	catch ( const out_of_range &oor ) {}
+	try { r_bluebits	= p_options.at(lwOpenGLCanvasAttributeEnum::LWGL_BLUE_BITS); }
+	catch ( const out_of_range &oor ) {}
+	try { r_alphabits	= p_options.at(lwOpenGLCanvasAttributeEnum::LWGL_ALPHA_BITS); }
+	catch ( const out_of_range &oor ) {}
+	try { r_depthbits	= p_options.at(lwOpenGLCanvasAttributeEnum::LWGL_DEPTH_BITS); }
+	catch ( const out_of_range &oor ) {}
+	try { r_stencilbits	= p_options.at(lwOpenGLCanvasAttributeEnum::LWGL_STENCIL_BITS); }
+	catch ( const out_of_range &oor ) {}
+
+	// -- Legacy compatibility
+    int r_colorbits = r_redbits + r_greenbits + r_bluebits + r_alphabits;
 
 	uint32_t style = WS_VISIBLE;
 	uint32_t ex_style = 0;
@@ -60,7 +92,7 @@ bool lwOpenGLCanvas::create( lwBaseControl* p_parent, std::map<int,int> &p_optio
 	this->device_context = (HDC)GetDC( (HWND)this->m_handle );
 	if ( this->device_context == nullptr )
 	{
-	    printf("GLCanvas: Failed to get GDI DC\n");
+	    fprintf(stderr, "GLCanvas: Failed to get GDI DC\n");
 		return false;
 	}
 
@@ -70,14 +102,14 @@ bool lwOpenGLCanvas::create( lwBaseControl* p_parent, std::map<int,int> &p_optio
         1,
         PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    //Flags
         PFD_TYPE_RGBA,            //The kind of framebuffer. RGBA or palette.
-        32,                        //Colordepth of the framebuffer.
+        r_colorbits,                        //Colordepth of the framebuffer.
         0, 0, 0, 0, 0, 0,
         0,
         0,
         0,
         0, 0, 0, 0,
-        24,                        //Number of bits for the depthbuffer
-        8,                        //Number of bits for the stencilbuffer
+        r_depthbits,                        //Number of bits for the depthbuffer
+        r_stencilbits,                        //Number of bits for the stencilbuffer
         0,                        //Number of Aux buffers in the framebuffer.
         PFD_MAIN_PLANE,
         0,

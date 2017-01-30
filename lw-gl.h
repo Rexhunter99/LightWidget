@@ -17,23 +17,34 @@ typedef void*					lwDeviceContextType;
 
 
 enum lwOpenGLCanvasAttributeEnum {
-    LWGL_PROFILE            = 0,
-    LWGL_COLOR_BITS,
+    LWGL_PROFILE            = 0, // Values: lwOpenGLCanvasProfileEnum
+
+    LWGL_RED_BITS,
+    LWGL_GREEN_BITS,
+    LWGL_BLUE_BITS,
+    LWGL_ALPHA_BITS,
     LWGL_DEPTH_BITS,
     LWGL_STENCIL_BITS,
+
     LWGL_MULTISAMPLEAA_SAMPLES,
+
     LWGL_API_MAJOR_VERSION,
     LWGL_API_MINOR_VERSION,
 
-    // END OF ATTRIBUTES
-    // BEGIN ATTRIBUTE VALUES
-
-    LWGL_PROFILE_LEGACY     = 0,    // Do not load extensions for extensible pixel formats or context creation (GL 2.1 and below)
-    LWGL_PROFILE_CORE       = 1,    // A core profile is desired, use extensions to retrieve a suitable context and pixel format (GL 3.0 and above)
-    LWGL_PROFILE_COMPAT     = 2,    // A compatibility profile is desired that allows deprecated functionality to be used in newer profiles.
-
+	LWGL_ATTRIBUTE_MAX
 };
 
+enum lwOpenGLCanvasProfileEnum
+{
+	// Do not load extensions for extensible pixel formats or context creation (GL 2.1 and below)
+	LWGL_PROFILE_LEGACY = 0,
+
+    // A core profile is desired, use extensions to retrieve a suitable context and pixel format (GL 3.0 and above)
+    LWGL_PROFILE_CORE,
+
+    // A compatibility profile is desired that allows deprecated functionality to be used in newer profiles.
+    LWGL_PROFILE_COMPAT
+};
 
 /** @class lwOpenGLCanvas
  * @version 1.0

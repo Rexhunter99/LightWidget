@@ -20,6 +20,7 @@
 					<Add option="-O0" />
 					<Add option="-DBACKEND_W32" />
 					<Add option="-D_DEBUG" />
+					<Add directory="./" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -29,6 +30,7 @@
 					<Add option="-lkernel32" />
 					<Add option="-lcomctl32" />
 					<Add option="-lcomdlg32" />
+					<Add directory="lib" />
 				</Linker>
 			</Target>
 			<Target title="Release-Win32">
@@ -43,6 +45,7 @@
 					<Add option="-std=c++11" />
 					<Add option="-DBACKEND_W32" />
 					<Add option="-DNDEBUG" />
+					<Add directory="./" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -51,6 +54,7 @@
 					<Add option="-lkernel32" />
 					<Add option="-lcomctl32" />
 					<Add option="-lcomdlg32" />
+					<Add directory="lib" />
 				</Linker>
 			</Target>
 			<Target title="Debug-X11">
@@ -84,21 +88,23 @@
 				<Option use_console_runner="0" />
 				<Compiler>
 					<Add option="-std=c++11" />
-					<Add option="-pg" />
 					<Add option="-g" />
 					<Add option="-fno-omit-frame-pointer" />
 					<Add option="-O0" />
 					<Add option="-DBACKEND_W32" />
 					<Add option="-D_DEBUG" />
+					<Add directory="../LightWidget" />
 				</Compiler>
 				<Linker>
-					<Add option="-pg -lgmon" />
 					<Add option="-pg" />
 					<Add option="-luser32" />
+					<Add option="-lopengl32" />
 					<Add option="-lgdi32" />
 					<Add option="-lkernel32" />
 					<Add option="-lcomctl32" />
 					<Add option="-lcomdlg32" />
+					<Add library="lib/libLWGL-dbg.a" />
+					<Add directory="lib/" />
 				</Linker>
 			</Target>
 		</Build>
