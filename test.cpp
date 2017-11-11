@@ -1,14 +1,13 @@
 
 #include "lw-main.h"
 #include "lw-resources.h"
-#include "lw-gl.h"
 #include <cstdio>
 #include <cstdlib>
 #include <memory.h>
 #include <chrono>
 #include <thread>
 
-#include <GL/gl.h>
+#include <gl/gl.h>
 
 using namespace std;
 
@@ -26,11 +25,6 @@ lwTreeView		treeview;
 lwTabGroup		tabs;
 lwDialog		g_about_dialog;
 lwStatic		dlg_txt;
-lwOpenGLCanvas	g_gl_canvas;
-
-std::thread     g_gl_thread;
-bool            g_gl_thread_quit = false;
-chrono::steady_clock::time_point time_application_start;
 
 
 /* Follows are implementations of event functions used in the test
@@ -86,42 +80,30 @@ void eventMainWindowResize( int32_t w, int32_t h )
 
 	treeview.move( window_x, window_y );
 	treeview.resize( 200, window_h );
-
-	g_gl_canvas.setCurrent();
-
-	g_gl_canvas.move( window_x, window_y );
-	g_gl_canvas.resize( window_w, window_h );
-
-	g_gl_canvas.unsetCurrent();
 }
 
 
 void threadOpenGLRender()
 {
 	/// -- NOTE: Can do OpenGL/Direct3D rendering if using a GL/D3D control, or just general runtime processing.
-	while ( !g_gl_thread_quit )
-	{
-		g_gl_canvas.setCurrent();
+	/*glcanvas.setCurrent();
 
-		glClearColor( 0.0f, 0.0f, 0.5f, 1.0f );
-		glClear( GL_COLOR_BUFFER_BIT );
-		glLoadIdentity();
+	glClearColor( 0.0f, 0.0f, 0.2f, 1.0f );
+	glClear( GL_COLOR_BUFFER_BIT );
+	glLoadIdentity();
 
-		chrono::steady_clock::time_point time_now = chrono::steady_clock::now();
-		chrono::duration<double> time_span = chrono::duration_cast<chrono::duration<double>>(time_now - time_application_start);
-		glRotatef( 360.0f * time_span.count(), 0.0f, 0.0f, 1.0f );
+	chrono::steady_clock::time_point time_now = chrono::steady_clock::now();
+	chrono::duration<double> time_span = chrono::duration_cast<chrono::duration<double>>(time_now - time_application_start);
+	glRotatef( 360.0f * time_span.count(), 0.0f, 0.0f, 1.0f );
 
-		glBegin( GL_TRIANGLES );
-			glColor3ub( 255, 0, 0 );	glVertex2f( 0.0f, 1.0f );
-			glColor3ub( 0, 255, 0 );	glVertex2f( 1.0f,-1.0f );
-			glColor3ub( 0, 0, 255 );	glVertex2f(-1.0f,-1.0f );
-		glEnd();
+	glBegin( GL_TRIANGLES );
+		glColor3ub( 255, 0, 0 );	glVertex2f( 0.0f, 1.0f );
+		glColor3ub( 0, 255, 0 );	glVertex2f( 1.0f,-1.0f );
+		glColor3ub( 0, 0, 255 );	glVertex2f(-1.0f,-1.0f );
+	glEnd();
 
-		g_gl_canvas.swapBuffers();
-
-		g_gl_canvas.unsetCurrent();
-		std::this_thread::sleep_for( chrono::milliseconds( 1 ) );
-	}
+	glcanvas.swapBuffers();*/
+	this_thread::sleep_for( chrono::milliseconds( 1 ) );
 }
 
 
@@ -130,10 +112,10 @@ int main( int argc, char **argv )
 	g_application = new lwApplication( argc, argv );
 	g_application->setAuthor( "Rexhunter99" );
 	g_application->setTitle( "Light Widget: Library Demo" );
-	g_application->setVersion( "0.2.0" );
+	g_application->setVersion( "0.0.0" );
 
 	// -- Used in the OpenGL rendering
-	time_application_start = chrono::steady_clock::now();
+	chrono::steady_clock::time_point time_application_start = chrono::steady_clock::now();
 
 	lwImageList project_imagelist;
 
@@ -234,22 +216,10 @@ int main( int argc, char **argv )
 	statusbar.setSectionText( 1, "Section 2" );
 	statusbar.setSectionText( 2, "Section 3" );
 
-	std::map<int,int> gl_options;
-	gl_options[lwOpenGLCanvasAttributeEnum::LWGL_API_MAJOR_VERSION]		= 3;
-	gl_options[lwOpenGLCanvasAttributeEnum::LWGL_API_MINOR_VERSION]		= 0;
-	gl_options[lwOpenGLCanvasAttributeEnum::LWGL_RED_BITS]		= 8;
-	gl_options[lwOpenGLCanvasAttributeEnum::LWGL_GREEN_BITS]	= 8;
-	gl_options[lwOpenGLCanvasAttributeEnum::LWGL_BLUE_BITS]		= 8;
-	gl_options[lwOpenGLCanvasAttributeEnum::LWGL_ALPHA_BITS]	= 8;
-	gl_options[lwOpenGLCanvasAttributeEnum::LWGL_DEPTH_BITS]	= 24;
-	g_gl_canvas.create( &g_window, gl_options );
-
 	// -- Resize and reposition elements properly
 	g_toolbar.resize(0,0);
 	g_window.redraw();
 	menubar.update();
-
-	g_gl_thread = std::thread(threadOpenGLRender);
 
 	// -- Run the message/main loop
 	printf( "Main loop begins\n" );
@@ -257,9 +227,6 @@ int main( int argc, char **argv )
 	printf( "Main loop ended\n" );
 
 	// -- Clean up the windows and controls
-	g_gl_thread_quit = true;
-	g_gl_thread.join();
-	g_gl_canvas.destroy();
 	g_window.destroy();
 
 	project_imagelist.destroy();

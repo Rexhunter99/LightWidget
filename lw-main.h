@@ -11,23 +11,21 @@
 // -- Unicode/MultiByte string
 #if defined( UNICODE )
 	typedef std::wstring lwStringType;
+	typedef wchar_t		lwCharType;
 #else
 	typedef std::string lwStringType;
+	typedef char		lwCharType;
 #endif // UNICODE || UTF16
 
 /// Define the TEXT macro to support wide and multichar string literals like WinAPI
-#if defined( UNICODE )
+#if defined( UNICODE ) && !defined( TEXT )
 	#undef __TEXT
 	#define __TEXT( s ) L##s
-	#if !defined(TEXT)
-	#	define TEXT(s) __TEXT(s)
-	#endif
+	#define TEXT(s) __TEXT(s)
 #else
 	#undef __TEXT
 	#define __TEXT( s ) s
-	#if !defined(TEXT)
-	#	define TEXT(s) __TEXT(s)
-	#endif
+	#define TEXT(s) __TEXT(s)
 #endif
 
 #ifndef lwNativeWindowType
@@ -270,7 +268,7 @@ class lwFileDialog
 {
 private:
 	lwStringType		m_path_filename;
-	lwStringType		m_extension_filter;
+	char*				m_extension_filter;
 	lwStringType		m_default_extension;
 	lwStringType		m_initial_directory;
 	lwStringType		m_title;
@@ -291,7 +289,7 @@ public:
 
 	void setInitialDirectory( lwStringType p_initial_directory );
 	void setDefaultExt( lwStringType p_default_extension );
-	void setFilters( lwStringType p_filters );
+	void setFilters( lwCharType* p_filters );
 	void setTitle( lwStringType p_title );
 	lwStringType open( lwBaseControl* p_window );
 	lwStringType save( lwBaseControl* p_window );

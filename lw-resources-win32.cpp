@@ -23,7 +23,6 @@
 #include <CommCtrl.h>
 #include <Windowsx.h>
 
-#include <iostream>
 #include <cstdio>
 #include <string>
 #include <fstream>
@@ -53,7 +52,7 @@ bool lwImage::create( uint32_t p_width, uint32_t p_height, uint8_t p_bitdepth, v
 	//this->bitmap = CreateBitmap( p_width, p_height, 1, p_bitdepth, p_data );
 	uint32_t *bits = nullptr;
 	HDC dc = GetDC( NULL );
-	//HDC mdc = nullptr;
+	HDC mdc = nullptr;
 	BITMAPV5HEADER bi;
 
 	ZeroMemory(&bi,sizeof(BITMAPV5HEADER));
@@ -74,7 +73,7 @@ bool lwImage::create( uint32_t p_width, uint32_t p_height, uint8_t p_bitdepth, v
 
 	if ( this->bitmap == nullptr )
 	{
-		std::cerr << "lwImage | ERROR | Failed to create the bitmap resource. Error Code: " << GetLastError() << std::endl;
+		fprintf( stderr, "lwImage | ERROR | Failed to create the bitmap resource. Error Code: %u\n", GetLastError() );
 		return false;
 	}
 
@@ -122,7 +121,7 @@ bool lwImage::createFromFile( string p_filename, uint32_t p_colorkey, uint32_t p
 
 	if ( data == nullptr )
 	{
-		std::cerr << "lwImage | SYSTEM ERROR | Unable to allocate memory for the bitmap data." << std::endl;
+		fprintf( stderr, "lwImage | SYSTEM ERROR | Unable to allocate memory for the bitmap data.\n" );
 		return false;
 	}
 	file.seekg( bf.bfOffBits + 1 );
@@ -130,7 +129,7 @@ bool lwImage::createFromFile( string p_filename, uint32_t p_colorkey, uint32_t p
 
 	file.close();
 
-	//fprintf( stderr, "lwImage | INFO | %d %d %d\n", bi.biWidth, bi.biHeight, bi.biBitCount );
+	fprintf( stderr, "lwImage | INFO | %d %d %d\n", bi.biWidth, bi.biHeight, bi.biBitCount );
 
 	bool r = this->create( bi.biWidth, bi.biHeight, bi.biBitCount, data, p_colorkey, p_bgcolor );
 

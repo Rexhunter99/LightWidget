@@ -2773,51 +2773,20 @@
 	<thread>
 	<gl/gl.h>
 
-1485777821 source:c:\users\owner\documents\github\lightwidget\lw-main-win32.cpp
+1427640691 source:m:\programming\lightwidget\lw-resources-win32.cpp
 	<Windows.h>
 	<CommCtrl.h>
 	<Windowsx.h>
-	<iostream>
 	<cstdio>
 	<string>
 	<fstream>
-	"lw-main.h"
 	"lw-resources.h"
-	<map>
-	<vector>
 
-1485771187 c:\users\owner\documents\github\lightwidget\lw-main.h
+1425175967 m:\programming\lightwidget\lw-resources.h
+	"lw-main.h"
+
+1508981257 m:\programming\lightwidget\lw-main.h
 	<stdint.h>
 	<string>
 	<vector>
-
-1482896865 c:\users\owner\documents\github\lightwidget\lw-resources.h
-	"lw-main.h"
-
-1485777926 source:c:\users\owner\documents\github\lightwidget\lw-resources-win32.cpp
-	<Windows.h>
-	<CommCtrl.h>
-	<Windowsx.h>
-	<iostream>
-	<cstdio>
-	<string>
-	<fstream>
-	"lw-resources.h"
-
-1485779100 source:c:\users\owner\documents\github\lightwidget\test.cpp
-	"lw-main.h"
-	"lw-resources.h"
-	"lw-gl.h"
-	<cstdio>
-	<cstdlib>
-	<memory.h>
-	<chrono>
-	<thread>
-	<GL/gl.h>
-
-1485776545 c:\users\owner\documents\github\lightwidget\lw-gl.h
-	<lw-main.h>
-	<map>
-	<string>
-	<mutex>
 

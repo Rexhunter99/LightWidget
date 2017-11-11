@@ -7,9 +7,7 @@
 #include <string>
 #include <mutex>
 
-
-
-#define LW_OPENGLCANVAS_VERSION "0.5"
+#define LW_OPENGLCANVAS_VERSION "1.0"
 
 
 typedef struct _OPENGLCONTEXT*	lwOpenGLContextType;
@@ -59,9 +57,13 @@ class lwOpenGLCanvas : public lwBaseControl
 {
 private:
 
-	lwOpenGLContextType gl_context;
-	lwDeviceContextType device_context;
+	lwOpenGLContextType m_context;
+	lwDeviceContextType m_device;
 	std::mutex          m_mutex;
+	std::map<std::string, bool> m_extensions;
+
+	void parseExtensions();
+	bool extensionIsSupported( const std::string &extension );
 
 public:
 
@@ -98,6 +100,9 @@ public:
 	 * Set this canvas's context as the current render target for OpenGL contexts
      */
 	bool unsetCurrent();
+
+	void lock();
+	void unlock();
 
 	/** @fn swapBuffers()
 	 * @brief Swap this canvas' back and front buffers

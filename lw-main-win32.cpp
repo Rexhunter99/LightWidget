@@ -38,7 +38,6 @@
 #include <CommCtrl.h>
 #include <Windowsx.h>
 
-#include <iostream>
 #include <cstdio>
 #include <string>
 #include <fstream>
@@ -649,8 +648,7 @@ void lwBaseControl::center()
 
 	rc.left = ( parent_rc.right / 2 ) - ( rc.right/2 );
 	rc.top = ( parent_rc.bottom / 2 ) - ( rc.bottom/2 );
-	std::cout << "center() :: " << parent_rc.right << " " << parent_rc.bottom << " " << rc.left << " " << rc.top << std::endl;
-	//printf( "center() :: %d, %d %d %d\n", parent_rc.right, parent_rc.bottom, rc.left, rc.top );
+	printf( "center() :: %d, %d %d %d\n", parent_rc.right, parent_rc.bottom, rc.left, rc.top );
 
 	SetWindowPos( (HWND)this->m_handle, 0, rc.left, rc.top, rc.right, rc.bottom, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER );
 }
@@ -910,7 +908,7 @@ void lwFileDialog::setDefaultExt( lwStringType p_default_extension )
 	this->m_default_extension = p_default_extension;
 }
 
-void lwFileDialog::setFilters( lwStringType p_filters )
+void lwFileDialog::setFilters( lwCharType* p_filters )
 {
 	this->m_extension_filter = p_filters;
 }
@@ -932,7 +930,7 @@ lwStringType lwFileDialog::open( lwBaseControl* p_window )
 	ofn.hwndOwner = (HWND)p_window->m_handle;
 	ofn.lpstrFile = out;
 	ofn.nMaxFile = MAX_PATH;
-	ofn.lpstrFilter = this->m_extension_filter.c_str();
+	ofn.lpstrFilter = this->m_extension_filter;
 	ofn.nFilterIndex = 1;
 	ofn.lpstrTitle = this->m_title.c_str();
 	ofn.lpstrFileTitle = NULL;
@@ -1347,7 +1345,7 @@ uint32_t lwTreeView::addItemTextImage( lwStringType p_text, int p_image, lwStrin
 	HTREEITEM				item;
 	HTREEITEM				parent = TVI_ROOT;
 	__treeview_data	*data = reinterpret_cast<__treeview_data*>(this->m_data);
-	//__treeview_item_data	*parent_item_data = nullptr;
+	__treeview_item_data	*parent_item_data = nullptr;
 	__treeview_item_map::iterator parent_it = data->items.end();
 	__treeview_item_data	new_item_data;
 
@@ -1403,8 +1401,7 @@ uint32_t lwTreeView::getBKColor()
 {
 	uint32_t c = TreeView_GetBkColor( (HWND)this->m_handle );
 
-	//if ( c == -1 ) // Windows says to test COLORREF (DWORD) against -1 which is signed...
-	if ( c == 0xFFFFFFFF )
+	if ( c == -1 )
 	{
 		c = GetSysColor( COLOR_WINDOW );
 	}
@@ -2184,7 +2181,7 @@ uint32_t lwToolBar::addSeparator( )
 void lwToolBar::removeButton( uint32_t p_index )
 {
 	SendMessage( (HWND)this->m_handle, TB_ADDBUTTONS, (WPARAM)p_index, (LPARAM)0 );
-	delete (TBBUTTON*)this->m_buttons[p_index];
+	delete this->m_buttons[p_index];
 	this->m_buttons.erase( this->m_buttons.begin() + p_index );
 }
 
