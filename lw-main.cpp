@@ -453,14 +453,20 @@ bool lwBaseControl::disable()
 
 void lwBaseControl::resize( uint32_t p_width, uint32_t p_height )
 {
-    if ( this->m_handle == nullptr ) return;
-    SetWindowPos( this->m_handle, nullptr, 0,0, p_width, p_height, SWP_NOMOVE | SWP_NOZORDER );
+	if ( this->m_handle == nullptr ) return;
+	SetWindowPos( this->m_handle, nullptr, 0,0, p_width, p_height, SWP_NOMOVE | SWP_NOZORDER );
 }
 
 void lwBaseControl::move( uint32_t p_x, uint32_t p_y )
 {
-    if ( this->m_handle == nullptr ) return;
-    SetWindowPos( this->m_handle, nullptr, p_x,p_y,0,0, SWP_NOSIZE | SWP_NOZORDER );
+	if ( this->m_handle == nullptr ) return;
+
+	POINT p;
+	p.x = p_x;
+	p.y = p_y;
+	ScreenToClient( GetParent(this->m_handle), &p );
+
+	SetWindowPos( this->m_handle, nullptr, p.x, p.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
 }
 
 void lwBaseControl::redraw()

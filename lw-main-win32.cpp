@@ -130,7 +130,9 @@ LONG_PTR APIENTRY WindowProcedure( HWND handle, UINT message, WPARAM wparam, LPA
 		return 0;
 
 	case WM_KEYDOWN:
+#ifdef _DEBUG
 		printf( "WindowProcedure :: Key Down\n" );
+#endif
 		if ( widget && widget->onKeyPress != nullptr ) widget->onKeyPress( (uint16_t)wparam );
 		return 0;
 
@@ -143,7 +145,9 @@ LONG_PTR APIENTRY WindowProcedure( HWND handle, UINT message, WPARAM wparam, LPA
 			{
 			case BN_CLICKED:
 				if ( widget && widget->onClick != nullptr ) widget->onClick( );
+#ifdef _DEBUG
 				printf( "WindowProcedure :: WM_COMMAND - BN_CLICKED\n" );
+#endif
 				break;
 			}
 		}
@@ -153,20 +157,26 @@ LONG_PTR APIENTRY WindowProcedure( HWND handle, UINT message, WPARAM wparam, LPA
 		{
 			HDROP drop = (HDROP) wparam;
 			char file[MAX_PATH];
-			lwStringType output = "";
+			std::vector<lwStringType> output;
+			UINT num = DragQueryFile(drop, 0xFFFFFFFF, file, MAX_PATH);
 
-			for ( unsigned int i = 0; i < DragQueryFile(drop, 0xFFFFFFFF, file, MAX_PATH); i++ )
+			for ( UINT i = 0; i < num; i++ )
 			{
-				if (!DragQueryFile(drop, i, file, MAX_PATH)) continue;
-				output += lwStringType(file) + "\n";
-			}
-			MessageBox(handle, output.c_str(), "Dropped", MB_OK);
+				if ( !DragQueryFile(drop, i, file, MAX_PATH) ) continue;
+				output.push_back( lwStringType(file) );
 
-			DragQueryFile(drop, 0, file, MAX_PATH);
+			}
+
+			//DragQueryFile(drop, 0, file, MAX_PATH);
 
 			DragFinish(drop);
 
-			//loadCAR(file);
+			lwFrame *frame = (lwFrame*)GetWindowLongPtr( (HWND)lparam, GWLP_USERDATA );
+
+			if ( frame->onFileDropped )
+			{
+				frame->onFileDropped( output );
+			}
 		}
 		break;
 
@@ -221,7 +231,9 @@ LONG_PTR APIENTRY WindowProcedure( HWND handle, UINT message, WPARAM wparam, LPA
 
 					if ( tvi->pszText != nullptr )
 					{
+#ifdef _DEBUG
 						printf( "TVN_ENDLABELEDIT :: Changed string to \"%s\"\n", tvi->pszText );
+#endif
 						if ( tv->onItemEditEnd != nullptr )
 						{
 							return tv->onItemEditEnd( lwStringType(tvi->pszText) );
@@ -379,7 +391,9 @@ lwApplication::lwApplication( int p_arg_count, char* p_arguments[] )
 
 		if ( !RegisterClassEx( &g_window_frame_class ) )
 		{
-			printf( "lwError: Failed to register the LW_WINDOWFRAME class!\n" );
+#ifdef _DEBUG
+			fprintf( stderr, "lwError: Failed to register the LW_WINDOWFRAME class!\n" );
+#endif
 		}
 	}
 
@@ -401,7 +415,9 @@ lwApplication::lwApplication( int p_arg_count, char* p_arguments[] )
 
         if ( !RegisterClassEx( &g_window_dialog_class ) )
         {
-            printf( "lwError: Failed to register the LW_WINDOWDIALOG class! Error: %u\n", (unsigned int)GetLastError() );
+#ifdef _DEBUG
+            fprintf( stderr, "lwError: Failed to register the LW_WINDOWDIALOG class! Error: %u\n", (unsigned int)GetLastError() );
+#endif
         }
 	}
 
@@ -642,15 +658,37 @@ bool lwBaseControl::focus()
 
 void lwBaseControl::center()
 {
-	RECT parent_rc, rc;
-	GetClientRect( GetParent( (HWND)this->m_handle ), &parent_rc );
+	RECT		rc;
+	RECT		rcParent;
+	uint32_t	style = GetWindowStyle( (HWND)this->m_handle );
+
 	GetWindowRect( (HWND)this->m_handle, &rc );
 
-	rc.left = ( parent_rc.right / 2 ) - ( rc.right/2 );
-	rc.top = ( parent_rc.bottom / 2 ) - ( rc.bottom/2 );
-	printf( "center() :: %d, %d %d %d\n", parent_rc.right, parent_rc.bottom, rc.left, rc.top );
+	if ( (style & WS_CHILD) )
+	{
+		HWND parent = GetParent( (HWND)this->m_handle );
 
-	SetWindowPos( (HWND)this->m_handle, 0, rc.left, rc.top, rc.right, rc.bottom, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER );
+		GetClientRect( parent, &rcParent );
+
+		//MapWindowPoints(hWndCenter, parent, (POINT*)&rc, 2);
+	}
+	else
+	{
+		MONITORINFO mi;
+		mi.cbSize = sizeof(mi);
+
+		GetMonitorInfo( MonitorFromWindow((HWND)this->m_handle, MONITOR_DEFAULTTOPRIMARY), &mi);
+		memcpy( &rcParent, &mi.rcWork, sizeof(RECT) );
+	}
+
+	int x = ( rcParent.left + rcParent.right ) / 2 - rc.right / 2;
+	int y = ( rcParent.top + rcParent.bottom ) / 2 - rc.bottom / 2;
+
+#ifdef _DEBUG
+	printf( "center() :: pwh:%d, %d  xy:%d %d\n", rcParent.right, rcParent.bottom, x, y );
+#endif
+
+	SetWindowPos( (HWND)this->m_handle, 0, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
 }
 
 void lwBaseControl::maximise()
@@ -721,7 +759,7 @@ bool lwToolTip::create( lwBaseControl* p_parent, lwBaseControl* p_target_control
 
 
 /************************************************************************
-** lwDialog method implementations
+** lwFrame method implementations
 */
 
 lwFrame::lwFrame() : lwBaseControl()
@@ -794,24 +832,6 @@ void lwFrame::getClientArea( int32_t* x, int32_t* y, int32_t* w, int32_t* h )
 	if ( h != nullptr ) *h = (rc.bottom - rc.top) - (sb_rc.bottom - sb_rc.top) - ( tb_rc.bottom - tb_rc.top );
 }
 
-void lwFrame::center()
-{
-	lwBaseControl::center();
-	/*RECT parent_rc, rc;
-
-	parent_rc.left = 0;
-	parent_rc.top = 0;
-	parent_rc.right = GetSystemMetrics( SM_CXSCREEN );
-	parent_rc.bottom = GetSystemMetrics( SM_CYSCREEN );
-
-	GetWindowRect( (HWND)this->m_handle, &rc );
-
-	rc.left = ( parent_rc.right / 2 ) - ( rc.right/2 );
-	rc.top = ( parent_rc.bottom / 2 ) - ( rc.bottom/2 );
-
-	SetWindowPos( (HWND)this->m_handle, 0, rc.left, rc.top, rc.right, rc.bottom, SWP_NOSIZE | SWP_NOZORDER );*/
-}
-
 void lwFrame::close()
 {
 	SendMessage((HWND) this->m_handle, WM_CLOSE, 0, 0 );
@@ -858,7 +878,7 @@ bool lwDialog::create( lwBaseControl* p_parent, lwStringType p_title )
 	if ( p_parent == nullptr )
 		return false;
 
-	uint32_t style = WS_CHILDWINDOW | WS_POPUP | WS_VISIBLE | WS_BORDER | WS_SYSMENU | WS_CAPTION;
+	uint32_t style = WS_CHILDWINDOW | WS_POPUP | WS_VISIBLE | WS_SYSMENU | WS_CAPTION;
 	if ( this->border      ) style |= WS_BORDER;
 	if ( this->titleBar    ) style |= WS_CAPTION;
 	if ( this->sizeable    ) style |= WS_SIZEBOX;
@@ -892,7 +912,7 @@ bool lwDialog::create( lwBaseControl* p_parent, lwStringType p_title )
 lwFileDialog::lwFileDialog( )
 {
 	this->m_default_extension = "*.*";
-	this->m_extension_filter = "All Files (*.*)\0*.*\0";
+	this->m_extension_filter = nullptr;
 	this->m_initial_directory = "";
 	this->m_path_filename = "";
 	this->m_title = "";
@@ -930,7 +950,7 @@ lwStringType lwFileDialog::open( lwBaseControl* p_window )
 	ofn.hwndOwner = (HWND)p_window->m_handle;
 	ofn.lpstrFile = out;
 	ofn.nMaxFile = MAX_PATH;
-	ofn.lpstrFilter = this->m_extension_filter;
+	ofn.lpstrFilter = (this->m_extension_filter) ? this->m_extension_filter : "All Files (*.*)\0*.*\0";
 	ofn.nFilterIndex = 1;
 	ofn.lpstrTitle = this->m_title.c_str();
 	ofn.lpstrFileTitle = NULL;
@@ -1401,7 +1421,7 @@ uint32_t lwTreeView::getBKColor()
 {
 	uint32_t c = TreeView_GetBkColor( (HWND)this->m_handle );
 
-	if ( c == -1 )
+	if ( (int32_t)c == -1 )
 	{
 		c = GetSysColor( COLOR_WINDOW );
 	}
@@ -1505,6 +1525,31 @@ bool lwTextInput::create( lwBaseControl *p_parent )
 	return true;
 }
 
+void lwTextInput::setPasswordChar( lwCharType p_char )
+{
+	SendMessage((HWND)this->m_handle, EM_SETPASSWORDCHAR, p_char, 0);
+}
+
+bool lwTextInput::setText( lwStringType p_text )
+{
+	int len = GetWindowTextLength((HWND)this->m_handle);
+    //Edit_SetSel()
+    SendMessage( (HWND)this->m_handle, EM_SETSEL, (WPARAM)0, (LPARAM)len);
+    SendMessage( (HWND)this->m_handle, EM_REPLACESEL, 0, (LPARAM) ((LPSTR) p_text.c_str()));
+
+    return true;
+}
+
+bool lwTextInput::addText( lwStringType p_text )
+{
+	int len = GetWindowTextLength((HWND)this->m_handle);
+    //Edit_SetSel()
+    SendMessage( (HWND)this->m_handle, EM_SETSEL, (WPARAM)len, (LPARAM)len);
+    SendMessage( (HWND)this->m_handle, EM_REPLACESEL, 0, (LPARAM) ((LPSTR) p_text.c_str()));
+
+    return true;
+}
+
 
 //
 
@@ -1525,7 +1570,11 @@ bool lwTextArea::create( lwBaseControl* p_parent )
 	}
 
 	uint32_t ex_style = 0;
-	uint32_t style = WS_VISIBLE | ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL;
+	uint32_t style = WS_VISIBLE | ES_WANTRETURN | ES_MULTILINE;
+	if ( this->autoHScroll )	style |= ES_AUTOHSCROLL;
+	if ( this->autoVScroll )	style |= ES_AUTOVSCROLL;
+	if ( this->hScroll )		style |= WS_HSCROLL;
+	if ( this->vScroll )		style |= WS_VSCROLL;
 	if ( this->border )			style |= WS_BORDER;
 	if ( this->readOnly )		style |= ES_READONLY;
 	if ( this->passwordInput )	style |= ES_PASSWORD;
@@ -1551,6 +1600,31 @@ bool lwTextArea::create( lwBaseControl* p_parent )
 	SendMessage((HWND) this->m_handle, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(FALSE, 0));
 
 	return  true;
+}
+
+void lwTextArea::setPasswordChar( lwCharType p_char )
+{
+	SendMessage((HWND)this->m_handle, EM_SETPASSWORDCHAR, p_char, 0);
+}
+
+bool lwTextArea::setText( lwStringType p_text )
+{
+	int len = GetWindowTextLength((HWND)this->m_handle);
+    //Edit_SetSel()
+    SendMessage( (HWND)this->m_handle, EM_SETSEL, (WPARAM)0, (LPARAM)len);
+    SendMessage( (HWND)this->m_handle, EM_REPLACESEL, 0, (LPARAM) ((LPSTR) p_text.c_str()));
+
+    return true;
+}
+
+bool lwTextArea::addText( lwStringType p_text )
+{
+	int len = GetWindowTextLength((HWND)this->m_handle);
+    //Edit_SetSel()
+    SendMessage( (HWND)this->m_handle, EM_SETSEL, (WPARAM)len, (LPARAM)len);
+    SendMessage( (HWND)this->m_handle, EM_REPLACESEL, 0, (LPARAM) ((LPSTR) p_text.c_str()));
+
+    return true;
 }
 
 

@@ -73,7 +73,7 @@ bool lwImage::create( uint32_t p_width, uint32_t p_height, uint8_t p_bitdepth, v
 
 	if ( this->bitmap == nullptr )
 	{
-		fprintf( stderr, "lwImage | ERROR | Failed to create the bitmap resource. Error Code: %u\n", GetLastError() );
+		fprintf( stderr, "lwImage | ERROR | Failed to create the bitmap resource. Error Code: %lu\n", GetLastError() );
 		return false;
 	}
 
@@ -129,7 +129,9 @@ bool lwImage::createFromFile( string p_filename, uint32_t p_colorkey, uint32_t p
 
 	file.close();
 
-	fprintf( stderr, "lwImage | INFO | %d %d %d\n", bi.biWidth, bi.biHeight, bi.biBitCount );
+#ifdef _DEBUG
+	fprintf( stderr, "lwImage | INFO | %ld %ld %dl\n", bi.biWidth, bi.biHeight, bi.biBitCount );
+#endif // _DEBUG
 
 	bool r = this->create( bi.biWidth, bi.biHeight, bi.biBitCount, data, p_colorkey, p_bgcolor );
 

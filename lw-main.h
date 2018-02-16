@@ -125,6 +125,8 @@ protected:
 public:
 
 	// -- Properties
+	uint32_t	hScroll:1;
+	uint32_t	vScroll:1;
 	uint32_t	border:1;
 	uint32_t	toolWindow:1;
 	uint32_t	dialogFrame:1;
@@ -134,7 +136,7 @@ public:
 	lwNativeWindowType	m_handle;
 
 	lwBaseControl();
-	~lwBaseControl();
+	virtual ~lwBaseControl();
 
 	/** @fn destroy()
 	 ** Close/Destroy and cleanup the widget
@@ -220,12 +222,14 @@ public:
 	lwFrame();
 	~lwFrame();
 
-	void center();
 	void close();
 	bool create( lwBaseControl* p_parent, const char* p_title );
 	void getClientArea( int32_t* x, int32_t* y, int32_t* w, int32_t* h );
 	void quit();
 	bool run();
+
+
+	void (*onFileDropped)( std::vector<lwStringType> );
 };
 
 
@@ -256,6 +260,8 @@ public:
 	 ** @return bool True if succeed, false if failed.
 	 **/
 	bool create( lwBaseControl* p_parent, lwStringType p_title );
+
+	void (*onFileDropped)( std::vector<lwStringType> );
 };
 
 
@@ -317,6 +323,9 @@ public:
 	~lwTextInput();
 
 	bool create( lwBaseControl* p_parent );
+	void setPasswordChar( lwCharType p_char );
+	bool setText( lwStringType p_text );
+	bool addText( lwStringType p_text );
 };
 
 
@@ -330,6 +339,8 @@ class lwTextArea : public lwBaseControl
 {
 public:
 
+	uint32_t	autoHScroll:1;
+	uint32_t	autoVScroll:1;
 	uint32_t	readOnly:1;
 	uint32_t	passwordInput:1;
 	uint32_t	numbersInput:1;
@@ -341,6 +352,9 @@ public:
 	~lwTextArea();
 
 	bool create( lwBaseControl* p_parent );
+	void setPasswordChar( lwCharType p_char );
+	bool setText( lwStringType p_text );
+	bool addText( lwStringType p_text );
 };
 
 
